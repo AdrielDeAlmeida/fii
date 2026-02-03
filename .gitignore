@@ -1,0 +1,29 @@
+# Arquivos de ambiente
+.env
+
+# Arquivos Excel (não mais necessários)
+*.xlsx
+*.xls
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+dist/
+*.egg-info/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Sistema
+.DS_Store
+Thumbs.db

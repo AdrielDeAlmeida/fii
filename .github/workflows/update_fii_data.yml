@@ -1,0 +1,64 @@
+name: Atualizar Dados FII no Supabase
+
+on:
+  # Executar automaticamente todos os dias às 9h (horário UTC)
+  schedule:
+    - cron: '0 9 * * *'
+  
+  # Permitir execução manual
+  workflow_dispatch:
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+      
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      
+      - name: Instalar dependências do sistema
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget unzip
+      
+      - name: Instalar Chrome
+        run: |
+          wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+          echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
+          sudo apt-get update
+          sudo apt-get install -y google-chrome-stable
+      
+      - name: Instalar ChromeDriver
+        run: |
+          CHROME_VERSION=$(google-chrome --version | awk '{print $3}' | cut -d'.' -f1)
+          CHROMEDRIVER_VERSION=$(curl -s "https://googlechromelabs.github.io/chrome-for-testing/LATEST_RELEASE_$CHROME_VERSION")
+          wget -q "https://storage.googleapis.com/chrome-for-testing-public/$CHROMEDRIVER_VERSION/linux64/chromedriver-linux64.zip"
+          unzip chromedriver-linux64.zip
+          sudo mv chromedriver-linux64/chromedriver /usr/local/bin/
+          sudo chmod +x /usr/local/bin/chromedriver
+          chromedriver --version
+      
+      - name: Instalar dependências Python
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      - name: Executar script de atualização
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+        run: python script.py
+      
+      - name: Notificar sucesso
+        if: success()
+        run: echo "✓ Dados atualizados com sucesso no Supabase!"
+      
+      - name: Notificar falha
+        if: failure()
+        run: echo "✗ Erro ao atualizar dados. Verifique os logs acima."
