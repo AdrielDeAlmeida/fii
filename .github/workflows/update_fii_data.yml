@@ -4,7 +4,10 @@ on:
   # Executar automaticamente todos os dias às 9h (horário UTC)
   schedule:
     - cron: '0 9 * * *'
-  
+    - cron: '1 2 * * *'
+    - cron: '1 5 * * *'
+    - cron: '1 9 * * *'
+    - cron: '2 0 * * *'
   # Permitir execução manual
   workflow_dispatch:
 
