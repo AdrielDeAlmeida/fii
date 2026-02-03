@@ -40,18 +40,29 @@ def main():
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-dev-shm-usage")
         options.add_argument("--disable-gpu")
+        # User-Agent realista para evitar bloqueios
+        options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+        
         driver = webdriver.Chrome(options=options)
         
         # URL da página
         url = "https://www.fundamentus.com.br/fii_resultado.php"
         log(f"Acessando {url}...")
+        
+        # Aumentar timeout da página
+        driver.set_page_load_timeout(30)
         driver.get(url)
         
-        # Aguarde o carregamento da página
-        wait = WebDriverWait(driver, 10)
-        table = wait.until(EC.presence_of_element_located((By.ID, "tabelaResultado")))
-        html_content = table.get_attribute('outerHTML')
-        log("Tabela carregada com sucesso!")
+        # Aguarde o carregamento da página (aumentado para 30s)
+        wait = WebDriverWait(driver, 30)
+        try:
+            table = wait.until(EC.presence_of_element_located((By.ID, "tabelaResultado")))
+            html_content = table.get_attribute('outerHTML')
+            log("Tabela carregada com sucesso!")
+        except Exception as te:
+            log("Erro ao carregar tabela. Salvando evidência...")
+            # Opcional: print(driver.page_source[:500]) # Ver se há captcha ou erro
+            raise te
         
         # Convertendo a tabela para DataFrame
         df = pd.read_html(StringIO(html_content))[0]
