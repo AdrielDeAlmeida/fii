@@ -3,10 +3,8 @@ name: Atualizar Dados FII no Supabase
 on:
   # Executar automaticamente todos os dias às 9h (horário UTC)
   schedule:
-    - cron: '30 9 * * *'
-    - cron: '30 10 * * *'
-    - cron: '30 15 * * *'
-    - cron: '30 18 * * *'
+    - cron: '30 13 * * *'
+    - cron: '30 21 * * *'
   # Permitir execução manual
   workflow_dispatch:
 
